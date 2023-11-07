@@ -4,6 +4,7 @@ const { PORT } = require('./utils/config')
 const app = express()
 
 app.use(cors())
+app.use(express.static('dist'))
 //parse request.body from request, from JSON into Js object
 app.use(express.json())
 
