@@ -1,7 +1,9 @@
+const cors = require('cors')
 const express = require('express')
 const app = express()
 
-//parse request.body from request into Js object
+app.use(cors())
+//parse request.body from request, from JSON into Js object
 app.use(express.json())
 
 let lessons = [
@@ -214,16 +216,47 @@ app.get('/api/lessons/:id', (request, response) => {
 })
 
 app.post('/api/lessons', (request, response) => {
-    const lesson = request.body
+    const body = request.body
+
+    if (!request.body) {
+        return response.status(400).json({
+            error: 'content missing'
+        })
+    }
+
+    if (!body.lesson || !body.title || !body.img || !body.body || !body.likes || !body.tags) {
+        return response.status(400).json({
+            error: 'content missing'
+        })
+    }
+
+    const lesson = {
+        id: 'Z0',
+        lesson: body.lesson,
+        title: body.title,
+        img: body.img,
+        body: body.body,
+        lorem: true,
+        likes: body.likes,
+        tags: body.tags
+    }
+
     console.log(lesson)
+    lessons = lessons.concat(lesson)
     response.json(lesson)
-  })
+})
 
 app.delete('/api/lessons/:id', (request, response) => {
     const id = request.params.id
     lessons = lessons.filter(elem => elem.id !== id)
     response.status(204).end()
 })
+
+const unknownEndPoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndPoint)
 
 const PORT = 3001
 app.listen(PORT, () => {
