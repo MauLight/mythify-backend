@@ -1,5 +1,6 @@
 const cors = require('cors')
 const express = require('express')
+const { PORT } = require('./utils/config')
 const app = express()
 
 app.use(cors())
@@ -258,7 +259,6 @@ const unknownEndPoint = (request, response) => {
 
 app.use(unknownEndPoint)
 
-const PORT = 3001
-app.listen(PORT, () => {
+app.listen(PORT || 3001, () => {
     console.log(`Server running on port ${PORT}`)
 })
