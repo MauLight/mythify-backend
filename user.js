@@ -1,10 +1,10 @@
-const user = {
-    firstname: '',
-    lastname: '',
-    password: '',
-    email: '',
-    birthday: '',
-    profileimg: '',
-    followers: [],
-    following: []
-}
+// const user = {
+//   firstname: '',
+//   lastname: '',
+//   password: '',
+//   email: '',
+//   birthday: '',
+//   profileimg: '',
+//   followers: [],
+//   following: []
+// }
