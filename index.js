@@ -1,4 +1,5 @@
 const { PORT, MONGODB_URL } = require('./utils/config')
+const User = require('./models/user')
 const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
@@ -6,11 +7,15 @@ const url = MONGODB_URL
 
 const app = express()
 
+// !Initialize middlewares
 app.use(cors())
+// *Serve static front end in localhost /
 app.use(express.static('dist'))
-//parse request.body from request, from JSON into Js object
+// *Parse request.body from request, from JSON into Js object
 app.use(express.json())
 
+
+// !Connect to MongoDB with mongoose
 mongoose.set('strictQuery', false)
 console.log(`Connecting to ${url}`)
 mongoose.connect(url)
@@ -21,21 +26,6 @@ mongoose.connect(url)
     console.log('Error connecting to MongoDB:', error.message)
   })
 
-const userSchema = new mongoose.Schema({
-  username: String,
-  password: String
-})
-
-//Transforms the returned object from database, _id field replaced with .id (string), delete _id and __v fields.
-userSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
-const User = mongoose.model('User', userSchema)
 
 let lessons = [
   {
@@ -227,24 +217,26 @@ let lessons = [
   },
 ]
 
-//request has all the info of the HTTP request, response is used to define how a request is responded to.
+
+// !EndPoints
+// *Request has all the info of the HTTP request, response is used to define how a request is responded to.
 app.get('/', (request, response) => {
   response.send('<h1>Hello Mau!</h1>')
 })
 
-//Get all lessons
+// *Get all lessons
 app.get('/api/lessons', (request, response) => {
   response.json(lessons)
 })
 
-//Get all users
+// *Get all users
 app.get('/api/users', (request, response) => {
   User.find({}).then(users => {
     response.json(users)
   })
 })
 
-//Get specific lesson
+// *Get specific lesson
 app.get('/api/lessons/:id', (request, response) => {
   const id = request.params.id
   const lesson = lessons.find(lesson => lesson.id === id)
@@ -255,15 +247,15 @@ app.get('/api/lessons/:id', (request, response) => {
   }
 })
 
-//Get specific user
+// *Get specific user
 app.get('/api/users/:id', (request, response, next) => {
-  //Find user by id, then ssend the result back in response json
+  // *Find user by id, then send the result back in response json
   User.findById(request.params.id).then(user => {
     if (user) {
       response.json(user)
     }
     else {
-      //not found
+      //*not found
       response.status(404).end()
     }
   })
@@ -271,7 +263,7 @@ app.get('/api/users/:id', (request, response, next) => {
 })
 
 
-//Post new lesson
+// *Post new lesson
 app.post('/api/lessons', (request, response) => {
   const body = request.body
 
@@ -303,7 +295,7 @@ app.post('/api/lessons', (request, response) => {
   response.json(lesson)
 })
 
-//Create new user
+// *Create new user
 app.post('/api/users', (request, response, next) => {
   const body = request.body
 
@@ -311,24 +303,24 @@ app.post('/api/users', (request, response, next) => {
     return response.status(400).json({ error: 'content missing' })
   }
 
-  //User constructor
+  // *User constructor
   const user = new User({
     username: body.username,
     password: body.password
   })
 
-  //Send to database method
+  // *Send to database method
   user.save().then(savedUser => {
     response.json(savedUser)
   })
     .catch(error => next(error))
 })
 
-//Update user information
+// *Update user information
 app.put('/api/users/:id', (request, response, next) => {
   const { username, password } = request.body
 
-  //runValidators key allows to validate client before submitting the update
+  //* runValidators key allows to validate client before submitting the update
   User.findByIdAndUpdate(request.params.id, { username, password }, { new: true, runValidators: true, context: 'query' })
     .then(updateUser => {
       response.json(updateUser)
@@ -337,7 +329,7 @@ app.put('/api/users/:id', (request, response, next) => {
 })
 
 
-//Delete user
+//*Delete user
 app.delete('/api/users/:id', (request, response, next) => {
   User.findByIdAndRemove(request.params.id)
     .then(result => {
@@ -346,13 +338,14 @@ app.delete('/api/users/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-//Delete lesson
+//*Delete lesson
 app.delete('/api/lessons/:id', (request, response) => {
   const id = request.params.id
   lessons = lessons.filter(elem => elem.id !== id)
   response.status(204).end()
 })
 
+// !Second set of middleware
 const unknownEndPoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
@@ -362,11 +355,11 @@ app.use(unknownEndPoint)
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  //CastError means the error is in _id for MongoDB
+  // *CastError means the error is in _id for MongoDB
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   }
-  //ValidationError means client inputs failed to pass mongoose validation
+  // *ValidationError means client inputs failed to pass mongoose validation
   else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
@@ -376,6 +369,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
+// !Set server to listen to port
 app.listen(PORT || 3001, () => {
   console.log(`Server running on port ${PORT}`)
 })

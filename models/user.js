@@ -6,11 +6,18 @@ const userSchema = new mongoose.Schema({
     minLength: 5,
     required: true
   },
-  password: {
+  passwordHash: {
     type: String,
     minLength: 8,
     required: true
-  }
+  },
+  // ! Stores an array of ObjectIds' from Project model
+  projects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project'
+    }
+  ]
 })
 
 userSchema.set('toJSON', {
@@ -18,6 +25,8 @@ userSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
+    // ! Hide PasswordHash
+    delete returnedObject.passwordHash
   }
 })
 
