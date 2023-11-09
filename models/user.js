@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 
 const userSchema = new mongoose.Schema({
   firstname: {
@@ -15,7 +14,6 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
     validate: {
       validator: function (v) {
         return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v)
@@ -58,8 +56,6 @@ const userSchema = new mongoose.Schema({
     }
   ]
 })
-
-userSchema.plugin(uniqueValidator)
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
