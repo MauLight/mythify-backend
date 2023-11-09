@@ -1,5 +1,44 @@
 const mongoose = require('mongoose')
 
+const Myth = new mongoose.Schema({
+  problem: String,
+  take: String,
+  concept: String,
+  myth_u: String
+})
+
+const Basis = new mongoose.Schema({
+  theme: String,
+  truth: String,
+  contrapositive: String,
+  lie: String,
+  flaw: String,
+  wound: String,
+  want: String,
+  antagonism: String,
+  need: String
+})
+
+const Protagonist = new mongoose.Schema({
+  protagonist_u: String,
+  chLogline: String,
+  belief: String,
+  falseBehavior: String,
+  uncertainty: String,
+  trueBehavior: String,
+  rightAction: String,
+  trueCharacter: String
+})
+
+const Opposition = new mongoose.Schema({
+  objective: String,
+  antagonismAnt: String,
+  antagonismAll: String,
+  sameObjective: String,
+  distance: String,
+  resolve: String
+})
+
 const projectSchema = new mongoose.Schema({
   writer: {
     type: mongoose.Schema.Types.ObjectId,
@@ -29,20 +68,16 @@ const projectSchema = new mongoose.Schema({
     minLength: 200
   },
   myth: {
-    type: { type: String },
-    ticker: String
+    type: Myth
   },
   basis: {
-    type: { type: String },
-    ticker: String
+    type: Basis
   },
   protagonist: {
-    type: { type: String },
-    ticker: String
+    type: Protagonist
   },
   opposition: {
-    type: { type: String },
-    ticker: String
+    type: Opposition
   },
   screenplay: {
     type: String
