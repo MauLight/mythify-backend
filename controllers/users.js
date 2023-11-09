@@ -11,18 +11,19 @@ usersRouter.get('/', async (_, response) => {
 })
 
 // *Get specific user
-usersRouter.get('/:id', (request, response, next) => {
+usersRouter.get('/:id', async (request, response) => {
   // *Find user by id, then send the result back in response json
-  User.findById(request.params.id).then(user => {
-    if (user) {
-      response.json(user)
-    }
-    else {
-      //*not found
-      response.status(404).end()
-    }
-  })
-    .catch(error => next(error))
+
+  const user = await User.findById(request.params.id).populate('projects')
+
+  if (user) {
+    response.json(user)
+  }
+  else {
+    //*not found
+    response.status(404).end()
+  }
+
 })
 
 // *Create new user

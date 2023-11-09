@@ -191,18 +191,14 @@ let lessons = [
 ]
 
 // !EndPoints
-// *Request has all the info of the HTTP request, response is used to define how a request is responded to.
-lessonsRouter.get('/', (request, response) => {
-  response.send('<h1>Hello Mau!</h1>')
-})
 
 // *Get all lessons
-lessonsRouter.get('/api/lessons', (request, response) => {
+lessonsRouter.get('/', (request, response) => {
   response.json(lessons)
 })
 
 // *Get specific lesson
-lessonsRouter.get('/api/lessons/:id', (request, response) => {
+lessonsRouter.get('/:id', (request, response) => {
   const id = request.params.id
   const lesson = lessons.find(lesson => lesson.id === id)
   if (lesson) {
@@ -213,7 +209,7 @@ lessonsRouter.get('/api/lessons/:id', (request, response) => {
 })
 
 // *Post new lesson
-lessonsRouter.post('/api/lessons', (request, response) => {
+lessonsRouter.post('/', (request, response) => {
   const body = request.body
 
   if (!request.body) {
@@ -245,7 +241,7 @@ lessonsRouter.post('/api/lessons', (request, response) => {
 })
 
 //*Delete lesson
-lessonsRouter.delete('/api/lessons/:id', (request, response) => {
+lessonsRouter.delete('/:id', (request, response) => {
   const id = request.params.id
   lessons = lessons.filter(elem => elem.id !== id)
   response.status(204).end()
